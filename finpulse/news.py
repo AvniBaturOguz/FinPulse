@@ -337,3 +337,43 @@ def fetch_raw_news(ticker: str) -> list[Any]:
 def get_articles(ticker: str, limit: int = MAX_NEWS_ARTICLES) -> list[Article]:
     """Fetch and normalize news for an already-normalized ticker."""
     return normalize_articles(fetch_raw_news(ticker), ticker, limit=limit)
+
+
+def fetch_ticker_metadata(ticker: str) -> dict[str, Any]:
+    """Best-effort company name and latest price. Never raises.
+
+    This is decorative: the dashboard shows it when present and simply omits it
+    otherwise, so a failure of Yahoo's quote endpoint can never take the news
+    sentiment feature down with it. Each lookup is guarded separately because
+    ``fast_info`` and ``info`` fail independently.
+    """
+    metadata: dict[str, Any] = {
+        "ticker": ticker,
+        "name": None,
+        "price": None,
+        "currency": None,
+    }
+
+    try:
+        handle = yf.Ticker(ticker)
+    except Exception:  # noqa: BLE001 - metadata must never break the request
+        return metadata
+
+    try:
+        fast_info = handle.fast_info
+        metadata["price"] = fast_info["last_price"]
+        metadata["currency"] = fast_info["currency"]
+    except Exception:  # noqa: BLE001
+        pass
+
+    try:
+        info = handle.info or {}
+        metadata["name"] = _first_str(info.get("shortName"), info.get("longName"))
+        if metadata["price"] is None:
+            metadata["price"] = info.get("regularMarketPrice")
+        if metadata["currency"] is None:
+            metadata["currency"] = info.get("currency")
+    except Exception:  # noqa: BLE001
+        pass
+
+    return metadata
