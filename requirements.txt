@@ -1,0 +1,21 @@
+# FinPulse direct dependencies (Python 3.12)
+# Only packages that are imported directly by project code are listed here;
+# transitive dependencies are resolved by pip.
+
+# Financial news + ticker metadata source (no API key required)
+yfinance>=1.5,<2.0
+
+# FinBERT tokenizer/model loading and inference
+transformers>=4.44,<6.0
+
+# Inference backend for FinBERT (CPU-only; the default Windows wheel has no CUDA)
+torch>=2.4,<3.0
+
+# Tabular handling for news records and chart data
+pandas>=2.2,<4.0
+
+# Dashboard UI
+streamlit>=1.40,<2.0
+
+# Development / testing
+pytest>=8.0,<10.0
