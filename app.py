@@ -149,7 +149,11 @@ def main():
     render_header()
 
     with st.form("ticker-form"):
-        columns = st.columns([3, 1, 1])
+        # Only the text input carries a label ("Ticker"), and that label adds
+        # vertical space above its box. With the default "top" alignment the
+        # unlabelled buttons therefore sit higher than the input they belong
+        # to; aligning to the bottom puts every control on the same baseline.
+        columns = st.columns([3, 1, 1], vertical_alignment="bottom")
         ticker = columns[0].text_input(
             "Ticker", value=DEFAULT_TICKER, placeholder="AAPL, NVDA, TSLA..."
         )
